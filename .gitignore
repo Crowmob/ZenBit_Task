@@ -1,4 +1,4 @@
-/zenbit_backend/node_modules
-/zenbit_backend/dist
-/zenbit_backend/.env
-/zenbit_backend/generated
+zenbit_backend/node_modules
+zenbit_backend/dist
+zenbit_backend/.env
+zenbit_backend/generated
