@@ -6,4 +6,7 @@ export class AuthUserDto {
 
   @IsString()
   password: string;
+
+  @IsString()
+  fingerprint: string;
 }
