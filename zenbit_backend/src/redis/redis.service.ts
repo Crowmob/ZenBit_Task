@@ -41,7 +41,7 @@ export class RedisService {
     return data ? (JSON.parse(data) as T) : null;
   }
 
-  async set(key: string, value: any) {
+  async set(key: string, value: any, ttlSeconds: number) {
     if (this.client.status === 'end') {
       this.logger.error(`Redis client dissconnected.`);
       throw new HttpException('Redis dissconnected', 500);
@@ -53,7 +53,7 @@ export class RedisService {
     }
 
     const data = JSON.stringify(value);
-    await this.client.set(key, data);
+    await this.client.set(key, data, 'EX', ttlSeconds);
     this.logger.log(`Setting key: ${key} in Redis`);
   }
 

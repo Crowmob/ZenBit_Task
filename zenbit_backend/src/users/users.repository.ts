@@ -23,4 +23,8 @@ export class UsersRepository {
   async getUserByEmail(email: string): Promise<User | null> {
     return this.repo.findOne({ where: { email } });
   }
+
+  async update(userId: number, values: Partial<User>) {
+    await this.repo.update({ id: userId }, values);
+  }
 }

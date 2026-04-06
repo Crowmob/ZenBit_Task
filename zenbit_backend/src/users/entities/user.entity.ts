@@ -3,14 +3,17 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  password: string;
+  password!: string;
+
+  @Column({ type: 'boolean', default: false })
+  isVerified!: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  created_at!: Date;
 }

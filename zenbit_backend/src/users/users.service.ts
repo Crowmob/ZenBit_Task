@@ -4,9 +4,10 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { AuthUserDto } from 'src/dto/auth-user.dto';
+import { AuthUserDto } from '../dto/auth-user.dto';
 import { UsersRepository } from './users.repository';
 import { QueryFailedError } from 'typeorm';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -75,6 +76,19 @@ export class UsersService {
       }
       this.logger.error(
         `Error occurred while finding user with email: ${email}`,
+      );
+      throw new HttpException('Database error', 500);
+    }
+  }
+
+  async update(userId: number, values: Partial<User>) {
+    try {
+      await this.findUserById(userId);
+      await this.usersRepository.update(userId, values);
+      this.logger.log(`Updated user with id: ${userId}`);
+    } catch {
+      this.logger.error(
+        `Error occurred while updating user with id: ${userId}`,
       );
       throw new HttpException('Database error', 500);
     }
