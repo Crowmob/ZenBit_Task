@@ -9,6 +9,8 @@ import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { finishLoading, setAuthenticated } from "./slices/authSlice"
 import { useFingerprint } from "./hooks/useFingerprint"
+import PublicOnleRoute from "./components/PublicOnlyRoute"
+import PrivateRoute from "./components/PrivateRoute"
 
 function App() {
   const dispatch = useDispatch();
@@ -31,14 +33,19 @@ function App() {
       <Header />
       <Routes>
         <Route path={ HomeRoute } element={<HomePage />} />
-        <Route path={LoginRoute} element={<AuthPage />} />
-        <Route path={RegisterRoute} element={<AuthPage />} />
-        <Route path={LogoutRoute} element={<AuthPage />} />
-        <Route path={ForgotPasswordRoute} element={<AuthPage />} />
-        <Route path={ResetPasswordRoute} element={<AuthPage />} />
-        <Route path={VerifyUserRoute} element={<AuthPage />} />
+        
+        <Route element={<PrivateRoute />}>
+            <Route path={LogoutRoute} element={<AuthPage />} />
+        </Route>
+
+        <Route element={<PublicOnleRoute />}>
+          <Route path={LoginRoute} element={<AuthPage />} />
+          <Route path={RegisterRoute} element={<AuthPage />} />
+          <Route path={ForgotPasswordRoute} element={<AuthPage />} />
+          <Route path={ResetPasswordRoute} element={<AuthPage />} />
+          <Route path={VerifyUserRoute} element={<AuthPage />} />
+        </Route>
       </Routes>
-      
     </>
   )
 }
