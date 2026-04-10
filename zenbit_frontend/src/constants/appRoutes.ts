@@ -1,5 +1,7 @@
 export const HomeRoute = '/';
-export const LoginRoute = '/login';
-export const RegisterRoute = '/register';
-export const ForgotPasswordRoute = '/forgot-password';
-export const ResetPasswordRoute = '/reset-password';
+export const LoginRoute = '/auth/login';
+export const RegisterRoute = '/auth/register';
+export const LogoutRoute = '/auth/logout';
+export const VerifyUserRoute = '/auth/verify/:token';
+export const ForgotPasswordRoute = '/auth/forgot-password';
+export const ResetPasswordRoute = '/auth/reset-password/:token';

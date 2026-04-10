@@ -1,11 +1,13 @@
 import { Box } from '@mui/material';
 import authPageImg from '../assets/authPageImg.png';
-import { useLocation } from 'react-router-dom';
-import { ForgotPasswordRoute, LoginRoute, RegisterRoute, ResetPasswordRoute } from '../constants';
+import { matchPath, useLocation } from 'react-router-dom';
+import { ForgotPasswordRoute, LoginRoute, LogoutRoute, RegisterRoute, ResetPasswordRoute, VerifyUserRoute } from '../constants';
 import LoginForm from '../components/LoginForm';
 import RegisterForm from '../components/RegisterForm';
 import ForgotPasswordForm from '../components/ForgotPasswordForm';
 import ResetPasswordForm from '../components/ResetPasswordForm';
+import VerifyUserForm from '../components/VerifyUserForm';
+import LogoutForm from '../components/LogoutForm';
 
 const AuthPage = () => {
   const { pathname } = useLocation();
@@ -36,8 +38,12 @@ const AuthPage = () => {
             <RegisterForm />
         ) : pathname === ForgotPasswordRoute ? (
             <ForgotPasswordForm />
-        ) : pathname === ResetPasswordRoute && (
+        ) : pathname === LogoutRoute ? (
+          <LogoutForm />
+        ) : matchPath({ path: ResetPasswordRoute, end: true }, pathname) ? (
           <ResetPasswordForm />
+        ) : matchPath({ path: VerifyUserRoute, end: true }, pathname) && (
+          <VerifyUserForm />
         )}
       </Box>
 

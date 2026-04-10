@@ -1,10 +1,55 @@
-import { Box, Button, TextField, Typography } from "@mui/material"
-import { Link } from "react-router-dom";
-import { ForgotPasswordRoute, RegisterRoute } from "../constants";
 import { useState } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material"
+import { Link, useNavigate } from "react-router-dom";
+
+import { ForgotPasswordRoute, HomeRoute, RegisterRoute } from "../constants";
+import { useLoginMutation } from "../api/authApi";
+import { useFingerprint } from "../hooks/useFingerprint";
+import { validateEmail, validatePassword } from "../utils/validations";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [hover, setHover] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [login, { isLoading: loginLoading }] = useLoginMutation();
+  const { fingerprint, loading: fingerprintLoading } = useFingerprint();
+
+  const handleLogin = async () => {
+    if (!fingerprint) return;
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage("Fill all fields")
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setErrorMessage('Invalid email format');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setErrorMessage('Invalid credentials');
+      return;
+    }
+
+    try {
+      await login({ email, password, fingerprint }).unwrap();
+      navigate(HomeRoute);
+      navigate(0);
+    } catch (err) {
+      const error = err as { status: number }
+
+      if (error.status === 401) {
+        setErrorMessage("Invalid credentials");
+      } else if (error.status === 403) {
+        setErrorMessage("You are not verified");
+      } else {
+        setErrorMessage("Something went wrong");
+      }
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: { xs: '90%', sm: '70%', md: '50%' } }}>
@@ -14,12 +59,26 @@ const LoginForm = () => {
 
       <Box>
         <Typography sx={{ fontSize: 15 }}>Email</Typography>
-        <TextField fullWidth placeholder="Email" sx={{ backgroundColor: '#e3e3e3', borderRadius: 1, border: 'none' }} />
+        <TextField 
+          fullWidth 
+          placeholder="Email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          sx={{ backgroundColor: '#e3e3e3', borderRadius: 1, border: 'none' }} 
+        />
       </Box>
 
       <Box>
         <Typography sx={{ fontSize: 15 }}>Password</Typography>
-        <TextField fullWidth placeholder="Password" type="password" sx={{ backgroundColor: '#e3e3e3', borderRadius: 1, border: 'none' }}/>
+        <TextField 
+          fullWidth 
+          placeholder="Password" 
+          type="password" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+          sx={{ backgroundColor: '#e3e3e3', borderRadius: 1, border: 'none' }}
+          autoComplete="off"
+        />
         <Link 
           to={ForgotPasswordRoute}
           style={{ textDecoration: 'none', color: 'inherit', textAlign: 'right' }}
@@ -28,7 +87,18 @@ const LoginForm = () => {
         </Link>
       </Box>
 
-      <Button variant="contained" fullWidth sx={{ backgroundColor: '#B29F7E', '&:hover': { backgroundColor: '#A08A6B' } }}>Login</Button>
+      <Button 
+        variant="contained" 
+        fullWidth 
+        disabled={fingerprintLoading || loginLoading}
+        sx={{ backgroundColor: '#B29F7E', '&:hover': { backgroundColor: '#A08A6B' } }}
+        onClick={handleLogin}
+      >
+        {loginLoading ? 'Logging in...' : 'Login'}
+      </Button>
+
+      {errorMessage && <Typography color="error" sx={{ textAlign: 'center', fontSize: 16}}>{errorMessage}</Typography>}
+
       <Typography sx={{ fontSize: 14, textAlign: 'center' }}>
         Dont have account?{' '}
         <Link

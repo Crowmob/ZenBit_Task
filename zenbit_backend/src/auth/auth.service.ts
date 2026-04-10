@@ -1,7 +1,9 @@
 import {
+  ConflictException,
   ForbiddenException,
   HttpException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
@@ -14,6 +16,8 @@ import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly usersService: UsersService,
     private readonly hashService: HashService,
@@ -44,9 +48,12 @@ export class AuthService {
       const token = this.jwtService.sign({ userId: user.id });
       res.cookie('accessToken', token, {
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'lax',
+        secure: false,
         maxAge: 3600 * 1000,
       });
+    } else {
+      throw new UnauthorizedException('Invalid credentials');
     }
   }
 
@@ -57,8 +64,10 @@ export class AuthService {
       userId = await this.usersService.create(authUserDto);
     } catch (error) {
       if (error instanceof HttpException && error.getStatus() === 409) {
-        userId = (await this.usersService.findUserByEmail(authUserDto.email))
-          .id;
+        const user = await this.usersService.findUserByEmail(authUserDto.email);
+        if (user.isVerified)
+          throw new ConflictException('You are already verified');
+        userId = user.id;
       } else {
         throw error;
       }
@@ -80,7 +89,7 @@ export class AuthService {
       } catch {
         res.clearCookie('accessToken', {
           httpOnly: true,
-          sameSite: 'strict',
+          sameSite: 'lax',
         });
       }
     }
@@ -95,7 +104,7 @@ export class AuthService {
       } catch {
         res.clearCookie('accessToken', {
           httpOnly: true,
-          sameSite: 'strict',
+          sameSite: 'lax',
         });
         throw new UnauthorizedException('Invalid token');
       }
@@ -116,7 +125,7 @@ export class AuthService {
     }
     res.clearCookie('accessToken', {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
     throw new UnauthorizedException('Session expired');
   }
@@ -140,7 +149,7 @@ export class AuthService {
     await this.redisService.set(`session:${payload.userId}`, value, 3600);
     res.cookie('accessToken', token, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 3600 * 1000,
     });
   }

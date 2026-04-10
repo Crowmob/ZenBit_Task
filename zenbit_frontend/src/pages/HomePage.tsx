@@ -51,19 +51,22 @@ const HomePage = () => {
         </Typography>
 
         <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap', pt: 2 }}>
-          { MockedData.map((item) => (           
-            <Box sx={{           
-              backgroundImage: `url(${item.image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              width: 630, 
-              height: 400, 
-              borderRadius: 5,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-end',
-              p: 2
-            }}>
+          { MockedData.map((item, index) => (           
+            <Box 
+              key={index}
+              sx={{           
+                backgroundImage: `url(${item.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                width: 630, 
+                height: 400, 
+                borderRadius: 5,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                p: 2
+              }}
+            >
               <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold' }}>
                   {item.name}
