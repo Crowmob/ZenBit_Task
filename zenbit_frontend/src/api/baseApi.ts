@@ -7,7 +7,6 @@ export const baseApi = createApi({
     credentials: 'include',
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
-      console.log(token)
 
       if (token) {
         headers.set("authorization", `Bearer ${token}`);

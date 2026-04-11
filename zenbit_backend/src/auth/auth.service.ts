@@ -85,11 +85,13 @@ export class AuthService {
 
   async me(fingerprint: string, req: Request) {
     const accessToken = req.headers.authorization;
+    this.logger.log(accessToken);
     if (accessToken) {
       let payload: { userId: string } | undefined = undefined;
       try {
         payload = this.jwtService.verify<{ userId: string }>(accessToken);
       } catch {
+        this.logger.log('1');
         throw new UnauthorizedException('Invalid token');
       }
       const user = await this.usersService.findUserById(
@@ -107,6 +109,7 @@ export class AuthService {
         }
       }
     }
+    this.logger.log('2');
     throw new UnauthorizedException('Session expired');
   }
 
