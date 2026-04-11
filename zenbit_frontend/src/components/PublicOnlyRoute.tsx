@@ -7,11 +7,11 @@ import { HomeRoute } from "../constants";
 
 
 const PublicOnlyRoute = () => {
-  const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { token, isLoading } = useSelector((state: RootState) => state.auth);
 
   if (isLoading) return <Typography>Loading...</Typography>
 
-  if (isAuthenticated) return <Navigate to={HomeRoute} />
+  if (token) return <Navigate to={HomeRoute} />
 
   return <Outlet />
 }
