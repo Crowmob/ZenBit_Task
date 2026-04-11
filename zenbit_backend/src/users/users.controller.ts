@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Query, Req } from '@nestjs/common';
 import type { Response, Request } from 'express';
 import { AuthService } from '../auth/auth.service';
 
@@ -7,12 +7,8 @@ export class UsersController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('me')
-  async me(
-    @Query('fingerprint') fingerprint: string,
-    @Res({ passthrough: true }) res: Response,
-    @Req() req: Request,
-  ) {
-    const user = await this.authService.me(fingerprint, req, res);
+  async me(@Query('fingerprint') fingerprint: string, @Req() req: Request) {
+    const user = await this.authService.me(fingerprint, req);
     return { email: user.email };
   }
 }
