@@ -1,33 +1,40 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { Resend } from 'resend';
 
 @Injectable()
 export class MailService {
-  constructor(private readonly mailerService: MailerService) {}
+  private resend: Resend;
 
-  async sendVerificationEmail(to: string, token: string) {
-    const url = `${process.env.API_URL}/auth/verify/${token}`;
+  constructor() {
+    this.resend = new Resend(process.env.RESEND_API_KEY);
+  }
 
-    await this.mailerService.sendMail({
-      to,
+  async sendVerificationEmail(email: string, token: string) {
+    const verifyUrl = `${process.env.API_URL}/verify/${token}`;
+
+    return await this.resend.emails.send({
+      from: 'onboarding@resend.dev', // or your verified domain
+      to: email,
       subject: 'Verify your email',
       html: `
-        <h2>Email Verification</h2>
-        <p>Click below to verify:</p>
-        <p>${url}</p>
+        <h2>Welcome 👋</h2>
+        <p>Click below to verify your email:</p>
+        <a href="${verifyUrl}">Verify Email</a>
       `,
     });
   }
-  async sendResetPasswordEmail(to: string, token: string) {
-    const url = `${process.env.API_URL}/auth/reset-password/${token}`;
 
-    await this.mailerService.sendMail({
-      to,
-      subject: 'Reset your password',
+  async sendResetPasswordEmail(email: string, token: string) {
+    const resetPasswordUrl = `${process.env.API_URL}/reset-password/${token}`;
+
+    return await this.resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: email,
+      subject: 'ResetYourPassword',
       html: `
-        <h2>Reset your password</h2>
+        <h2>Welcome 👋</h2>
         <p>Click below to reset your password:</p>
-        <p>${url}</p>
+        <a href="${resetPasswordUrl}">Reset password</a>
       `,
     });
   }
