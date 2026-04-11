@@ -1,12 +1,15 @@
-import { Body, Controller, Get } from '@nestjs/common';
-import { AuthService } from './auth/auth.service';
+import { Controller, Get } from '@nestjs/common';
+import { MailService } from './mail/mail.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly mailService: MailService) {}
 
   @Get('health')
-  healthCheck() {
-    return { status: 'OK' };
+  async healthCheck() {
+    return await this.mailService.sendVerificationEmail(
+      'valerazakolotiuk@gmail.com',
+      '123',
+    );
   }
 }
