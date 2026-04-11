@@ -7,7 +7,7 @@ import type { RootState } from "../store";
 const Header = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { token, isLoading } = useSelector((state: RootState) => state.auth);
 
   return (
     <Box sx={{ backgroundColor: 'rgb(12, 12, 20)', pt: 1, pb: 1 }}>
@@ -22,7 +22,7 @@ const Header = () => {
         }}>
           { isLoading ? (
             <Typography variant="h4">Loading...</Typography>
-          ) : !isAuthenticated ? (
+          ) : !token ? (
             <>
             <Button 
               onClick={() => navigate(LoginRoute)}

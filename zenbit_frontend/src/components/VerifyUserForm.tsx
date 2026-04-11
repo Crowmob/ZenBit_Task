@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setToken } from "../slices/authSlice";
 
 import { useVerifyUserMutation } from "../api/authApi";
 import { useFingerprint } from "../hooks/useFingerprint";
 import { HomeRoute } from "../constants";
 
-
 const VerifyUserForm = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { token } = useParams();
   const [errorMessage, setErrorMessage] = useState('');
@@ -18,7 +20,9 @@ const VerifyUserForm = () => {
     const handleVerify = async () => {
       if (token && fingerprint) {
         try {
-          await verifyUser({ token, fingerprint }).unwrap();
+          const data = await verifyUser({ token, fingerprint }).unwrap();
+          localStorage.setItem('token', data.token);
+          dispatch(setToken(token));
           navigate(HomeRoute);
         } catch (err) {
           const error = err as { status: number }
@@ -32,7 +36,7 @@ const VerifyUserForm = () => {
     }
 
     handleVerify();
-  }, [fingerprint, token, verifyUser, navigate])
+  }, [fingerprint, token, verifyUser, navigate, dispatch])
 
   return (
     <Box>

@@ -4,7 +4,7 @@ import { baseApi } from "./baseApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<undefined, AuthRequest>({
+    login: builder.mutation<{ token: string }, AuthRequest>({
       query: (body) => ({
         url: authEndpoints.login,
         method: POST,
@@ -38,7 +38,7 @@ export const authApi = baseApi.injectEndpoints({
         body
       })
     }),
-    verifyUser: builder.mutation<undefined, VerifyUserRequest>({
+    verifyUser: builder.mutation<{ token: string }, VerifyUserRequest>({
       query: (body) => ({
         url: authEndpoints.verifyUser,
         method: PUT,

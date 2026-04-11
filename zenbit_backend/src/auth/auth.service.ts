@@ -26,7 +26,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(authUserDto: AuthUserDto, res: Response) {
+  async login(authUserDto: AuthUserDto) {
     const user = await this.usersService.findUserByEmail(authUserDto.email);
     if (!user.isVerified) {
       throw new ForbiddenException('Email not verified');
@@ -46,13 +46,7 @@ export class AuthService {
       };
       await this.redisService.set(`session:${user.id}`, value, 3600);
       const token = this.jwtService.sign({ userId: user.id });
-      res.cookie('accessToken', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        domain: '.duckdns.org',
-        maxAge: 3600 * 1000,
-      });
+      return token;
     } else {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -77,42 +71,25 @@ export class AuthService {
     await this.mailService.sendVerificationEmail(authUserDto.email, token);
   }
 
-  async logout(req: Request, res: Response) {
-    const accessToken = req.cookies['accessToken'] as string;
+  async logout(req: Request) {
+    const accessToken = req.headers.authorization;
     if (accessToken) {
       try {
         const payload: { userId: string } = this.jwtService.verify(accessToken);
         await this.redisService.del(`session:${payload.userId}`);
-        res.clearCookie('accessToken', {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          domain: '.duckdns.org',
-        });
       } catch {
-        res.clearCookie('accessToken', {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          domain: '.duckdns.org',
-        });
+        throw new HttpException('Invalid token', 401);
       }
     }
   }
 
-  async me(fingerprint: string, req: Request, res: Response) {
-    const accessToken = req.cookies['accessToken'] as string;
+  async me(fingerprint: string, req: Request) {
+    const accessToken = req.headers.authorization;
     if (accessToken) {
       let payload: { userId: string } | undefined = undefined;
       try {
         payload = this.jwtService.verify<{ userId: string }>(accessToken);
       } catch {
-        res.clearCookie('accessToken', {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          domain: '.duckdns.org',
-        });
         throw new UnauthorizedException('Invalid token');
       }
       const user = await this.usersService.findUserById(
@@ -130,16 +107,10 @@ export class AuthService {
         }
       }
     }
-    res.clearCookie('accessToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      domain: '.duckdns.org',
-    });
     throw new UnauthorizedException('Session expired');
   }
 
-  async verifyEmail(token: string, res: Response, fingerprint: string) {
+  async verifyEmail(token: string, fingerprint: string) {
     let payload: { userId: string };
     try {
       payload = this.jwtService.verify<{ userId: string }>(token);
@@ -156,13 +127,7 @@ export class AuthService {
       fingerprint,
     };
     await this.redisService.set(`session:${payload.userId}`, value, 3600);
-    res.cookie('accessToken', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 3600 * 1000,
-      domain: '.duckdns.org',
-    });
+    return token;
   }
 
   async resetPasswordRequest(email: string) {

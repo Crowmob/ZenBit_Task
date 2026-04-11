@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useLogoutMutation } from "../api/authApi";
 import { LoginRoute } from "../constants";
-import { setUnauthenticated } from "../slices/authSlice";
+import { clearToken } from "../slices/authSlice";
 
 const LogoutForm = () => {
   const navigate = useNavigate();
@@ -12,8 +12,9 @@ const LogoutForm = () => {
   const [logout, { isLoading }] = useLogoutMutation();
 
   const handleLogout = async () => {
+    dispatch(clearToken());
+    localStorage.setItem('token', '');
     await logout().unwrap();
-    dispatch(setUnauthenticated());
     navigate(LoginRoute);
   }
 

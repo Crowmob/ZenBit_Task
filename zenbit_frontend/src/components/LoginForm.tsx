@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setToken } from "../slices/authSlice";
 
 import { ForgotPasswordRoute, HomeRoute, RegisterRoute } from "../constants";
 import { useLoginMutation } from "../api/authApi";
@@ -8,6 +10,7 @@ import { useFingerprint } from "../hooks/useFingerprint";
 import { validateEmail, validatePassword } from "../utils/validations";
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [hover, setHover] = useState(false);
   const [email, setEmail] = useState('');
@@ -35,7 +38,9 @@ const LoginForm = () => {
     }
 
     try {
-      await login({ email, password, fingerprint }).unwrap();
+      const data = await login({ email, password, fingerprint }).unwrap(); 
+      localStorage.setItem('token', data.token);
+      dispatch(setToken(data.token));
       navigate(HomeRoute);
       navigate(0);
     } catch (err) {

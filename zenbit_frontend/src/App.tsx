@@ -7,7 +7,7 @@ import { ForgotPasswordRoute, HomeRoute, LoginRoute, LogoutRoute, RegisterRoute,
 import { useGetMeQuery } from "./api/usersApi"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { finishLoading, setAuthenticated } from "./slices/authSlice"
+import { clearToken, finishLoading, setToken } from "./slices/authSlice"
 import { useFingerprint } from "./hooks/useFingerprint"
 import PublicOnleRoute from "./components/PublicOnlyRoute"
 import PrivateRoute from "./components/PrivateRoute"
@@ -15,17 +15,29 @@ import PrivateRoute from "./components/PrivateRoute"
 function App() {
   const dispatch = useDispatch();
   const { fingerprint, loading: loadingFingerprint } = useFingerprint();
-  const { data: me, isLoading: meLoading, isUninitialized } = useGetMeQuery({ fingerprint: fingerprint ?? '' }, { skip: loadingFingerprint });
+  const { 
+    data: me, 
+    isLoading: meLoading, 
+    isUninitialized, 
+    isError 
+  } = useGetMeQuery({ fingerprint: fingerprint ?? '' }, { skip: loadingFingerprint });
 
   useEffect(() => {
     if (isUninitialized) return;
 
+    if (isError) {
+      localStorage.setItem('token', '');
+      dispatch(clearToken());
+      return;
+    }
+
     if (!meLoading && me) {
-      dispatch(setAuthenticated())
+      dispatch(setToken(localStorage.getItem('token')))
     } else if (!meLoading && !me) {
       dispatch(finishLoading())
+      localStorage.setItem('token', '');
     }
-  }, [meLoading, me, dispatch, isUninitialized])
+  }, [meLoading, me, dispatch, isUninitialized, isError])
 
   return (
     <>
