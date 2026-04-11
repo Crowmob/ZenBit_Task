@@ -39,6 +39,7 @@ const LoginForm = () => {
 
     try {
       const data = await login({ email, password, fingerprint }).unwrap(); 
+      console.log(data.token);
       localStorage.setItem('token', data.token);
       dispatch(setToken(data.token));
       navigate(HomeRoute);
