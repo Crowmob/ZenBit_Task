@@ -48,8 +48,8 @@ export class AuthService {
       const token = this.jwtService.sign({ userId: user.id });
       res.cookie('accessToken', token, {
         httpOnly: true,
-        sameSite: 'lax',
-        secure: false,
+        secure: true,
+        sameSite: 'none',
         maxAge: 3600 * 1000,
       });
     } else {
@@ -84,12 +84,14 @@ export class AuthService {
         await this.redisService.del(`session:${payload.userId}`);
         res.clearCookie('accessToken', {
           httpOnly: true,
-          sameSite: 'strict',
+          secure: true,
+          sameSite: 'none',
         });
       } catch {
         res.clearCookie('accessToken', {
           httpOnly: true,
-          sameSite: 'lax',
+          secure: true,
+          sameSite: 'none',
         });
       }
     }
@@ -104,7 +106,8 @@ export class AuthService {
       } catch {
         res.clearCookie('accessToken', {
           httpOnly: true,
-          sameSite: 'lax',
+          secure: true,
+          sameSite: 'none',
         });
         throw new UnauthorizedException('Invalid token');
       }
@@ -125,7 +128,8 @@ export class AuthService {
     }
     res.clearCookie('accessToken', {
       httpOnly: true,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
     });
     throw new UnauthorizedException('Session expired');
   }
@@ -149,7 +153,8 @@ export class AuthService {
     await this.redisService.set(`session:${payload.userId}`, value, 3600);
     res.cookie('accessToken', token, {
       httpOnly: true,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 3600 * 1000,
     });
   }
