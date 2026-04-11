@@ -50,6 +50,7 @@ export class AuthService {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
+        domain: '.duckdns.org',
         maxAge: 3600 * 1000,
       });
     } else {
@@ -86,12 +87,14 @@ export class AuthService {
           httpOnly: true,
           secure: true,
           sameSite: 'none',
+          domain: '.duckdns.org',
         });
       } catch {
         res.clearCookie('accessToken', {
           httpOnly: true,
           secure: true,
           sameSite: 'none',
+          domain: '.duckdns.org',
         });
       }
     }
@@ -108,6 +111,7 @@ export class AuthService {
           httpOnly: true,
           secure: true,
           sameSite: 'none',
+          domain: '.duckdns.org',
         });
         throw new UnauthorizedException('Invalid token');
       }
@@ -130,6 +134,7 @@ export class AuthService {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+      domain: '.duckdns.org',
     });
     throw new UnauthorizedException('Session expired');
   }
@@ -156,6 +161,7 @@ export class AuthService {
       secure: true,
       sameSite: 'none',
       maxAge: 3600 * 1000,
+      domain: '.duckdns.org',
     });
   }
 
