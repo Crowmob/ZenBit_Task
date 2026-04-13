@@ -80,6 +80,7 @@ const RegisterForm = () => {
           sx={{ backgroundColor: '#e3e3e3', borderRadius: 1, border: 'none' }}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="off"
         />
       </Box>
 
