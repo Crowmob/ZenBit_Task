@@ -5,3 +5,5 @@ zenbit_backend/generated
 
 zenbit_frontend/node_modules
 zenbit_frontend/.env
+
+warsaw-windows.pem
